@@ -108,6 +108,7 @@ func (s Session) AboutSubreddit(subreddit string) (*Subreddit, error) {
 		useragent: s.useragent,
 	}
 	body, err := req.getResponse()
+
 	if err != nil {
 		return nil, err
 	}
@@ -167,4 +168,36 @@ func (s Session) CaptchaImage(iden string) (image.Image, error) {
 	}
 
 	return m, nil
+}
+
+// SubredditComments returns all the newest comments in the subreddit
+func (s Session) SubredditComments(subreddit string) ([]*Comment, error) {
+	baseUrl := "https://www.reddit.com"
+
+	// If subbreddit given, add to URL
+	if subreddit != "" {
+		baseUrl += "/r/" + subreddit
+	}
+
+	redditUrl := fmt.Sprintf(baseUrl + "/comments.json")
+
+	req := request{
+		url:       redditUrl,
+		useragent: s.useragent,
+	}
+
+	body, err := req.getResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	r := json.NewDecoder(body)
+	var interf interface{}
+	if err = r.Decode(&interf); err != nil {
+		return nil, err
+	}
+	helper := new(helper)
+	helper.buildComments(interf)
+
+	return helper.comments, nil
 }

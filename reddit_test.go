@@ -10,7 +10,7 @@ func TestSubmit(t *testing.T) {
 		"tester",
 	)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	subreddit, err := session.AboutSubreddit("mybottester")
@@ -74,5 +74,13 @@ func TestListings(t *testing.T) {
 	_, err = session.MySaved(NewSubmissions, "")
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSubredditComments(t *testing.T) {
+	session := NewSession("tester")
+	_, err := session.SubredditComments("all")
+	if err != nil {
+		t.Error(err)
 	}
 }
